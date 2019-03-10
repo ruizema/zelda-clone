@@ -1,4 +1,3 @@
-
 public class Entity {
     private int nbLives; // The entity's number of lives
     private int xPosition; // the x coordinate of the entity on the map

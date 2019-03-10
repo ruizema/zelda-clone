@@ -1,6 +1,6 @@
 public class Zoe extends Entity {
-    private boolean hasCurrentHexaforce=false;
-    private int nbLives=5;
+    private boolean hasCurrentHexaforce = false;
+    private static int nbLives = 5;
     private int y;
     private int x;
 

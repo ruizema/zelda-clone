@@ -18,5 +18,7 @@ public class LegendOfZoe {
         // Paire is just a generic pair of key-value
 
         // TODO : Write all needed object/function shells
+        // TODO : Find out how the exit works
+        // Zoe's life is now static lol
     }
 }
