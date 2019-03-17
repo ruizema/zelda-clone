@@ -1,18 +1,18 @@
-public class Entity {
-    private int levelNb=Level.getLevelNumber();//needs to be staitc but isn't
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public abstract class Entity {
+
     private String name;
     private int nbLives;
     private int x;
     private int y;
     private int strength;
-    private boolean isDead= isDead();
+    private Level level;
+    private boolean isDead;
 
-
-//FROM HERE
-
-    //how to make it static without instantiating a new level.
-    private  Object[] object=new Object[Level.getNbObjects()];
-    private void  findEntity() {
+    /*
+    private void findEntity() {
         //not to sure here because I'm not sure what your object table in level contains, if its a table
         //that just seperated ":" with this and idk ..
         for (int i = 0; i < Level.getNbObjects(); i++) {
@@ -22,7 +22,6 @@ public class Entity {
             }
         }
     }
-
     public Object[] getEntities(){
         findEntity();
         return this.object;//the object table is now updated with entities
@@ -30,10 +29,6 @@ public class Entity {
     public Entity getEntity(int idx){
         return (Entity) object[idx];//casting it as an entity
     }
-//TO HERE , is where I am confused on how to get the info on entities from level.java
-
-
-
     private boolean[][] walls=new boolean[Level.getMapWidth()][Level.getMapHeight()];//x,y
     private void findWalls(){
         for(int i=0;i<Level.getMapHeight();i++){
@@ -49,102 +44,115 @@ public class Entity {
     public boolean wallExist(int x, int y ){
         getWallTable();
         return this.walls[x][y];
-
     }
     public void setWall( int x, int y) {
         if (wallExist(x, y)) {
             walls[y][x] = false;
         }
     }
+     */
 
-    public Entity(){}//default constructor or else it doesn't let me have contructors for my extended classes
+    // Accessor functions
 
     public int getNbLives() {
         return nbLives;
     }
 
-    public void setNbLives(int nbLives){
-        this.nbLives=nbLives;
-    }
+    public int[] getPosition() { return new int[]{x, y}; }
 
-    public int[] getPosition() {
-        int[] coordinate= {x,y};
-        return coordinate;
-    }
+    public void setX(int x) { this.x = x; }
 
-    public void setPosition(int x, int y){
-        int[] coordinates = getPosition();//or {x,y}? because I want to modify the entities actual position
-        coordinates[0]=x;
-        coordinates[1]=y;
-    }
+    public void setY(int y) { this.y = y; }
 
-    public void setX(int newX){
-        int[] coordinates= getPosition();
-        coordinates[0]=newX;
-    }
+    public boolean getIsDead() { return isDead; }
 
-    public void setY(int newY){
-        int[] coordinates= getPosition();
-        coordinates[1]=newY;
-    }
+    // Action functions
 
-    public int getStrength(Entity attacker){//the attacker is the current entity
-        int strength=0;
-
-        if((attacker.name).equals("Monster")){
-            int formula= (int) Math.max(0.4 * (levelNb),1);
-            strength=formula;
-
-        }else if((attacker.name).equals("Zoe")){
-            strength= 1;//zoe removes one life at a time
-        }
-        return strength;
-    }
-
-    public int[][] getAdjacentCoordinates(int x, int y) {
-        int[] position = new int[2];
-        x = position[0];
-        y = position[1];//x,y in parameters are put in 1D table
-        int [][] neighbours= new int[9][2];//9 rows 2 col
-
-        for(var r =0 ;r<neighbours.length;r++) {
-            for (var i = -1; i <= 1; i++) {
-                for (var j = -1; j <= 1; j++) {
-                    neighbours[r][0] =x + j;
-                    neighbours[r][1]=y + i;
-                }
+    public void attack() {
+        Entity[] adjacentEntities = getAdjacentEntities();
+        for (int i = 0; i < adjacentEntities.length; i++) {
+            Entity entity = adjacentEntities[i];
+            Class currentClass = this.getClass();
+            if (entity.getClass() != this.getClass() && !(entity.getIsDead())) {
+                entity.attacked(this.strength);
             }
         }
+    }
+
+    public abstract void move(int x, int y);
+
+    public void attacked(int damage) {
+        nbLives = nbLives - damage;
+        if (nbLives <= 0) {
+            isDead = true;
+        }
+    }
+
+    // Helper functions for the level
+
+    public int[][] getAdjacentCoordinates() {
+
+        int [][] neighbours= new int[9][2];
+        int count = 0;
+
+        for (var i = -1; i <= 1; i++) {
+            for (var j = -1; j <= 1; j++) {
+                neighbours[count][0] = x + i;
+                neighbours[count][1] = y + j;
+                count++;
+            }
+        }
+
         return neighbours;
 
     }
 
+    public Entity[] getAdjacentEntities() {
+
+        int[][] adjacentCoordinates = getAdjacentCoordinates();
+        ArrayList<Entity> adjacentEntities = new ArrayList<>();
+
+        for (int i = 0; i < adjacentCoordinates.length; i++) {
+            for (int j = 0; j < level.getNbObjects(); j++) {
+                if
+            }
+        }
+
+        for (int i = 0; i < level.getNbObjects(); i++) {
+            Object object = level.getObject(i);
+            if (object instanceof Entity) {
+                Entity entity = (Entity) object;
+                for (int j = 0; j < adjacentCoordinates.length; j++) {
+                    if (Arrays.equals(entity.getPosition(), adjacentCoordinates[j])) { adjacentEntities.add(entity); }
+                }
+            }
+        }
+
+        return adjacentEntities.toArray(Entity[]::new);
+    }
+
+    /*
+    
     //return the empty cells not containing walls, so possible moves for entities
     public int[][] checkAdjctWalls(int x,int y){
         int[][] potentialNeighbours = getAdjacentCoordinates(x,y);
         int[][] realNeighbours= new int[9][2];
-
         for(int i=0;i<potentialNeighbours.length;i++){
             int xVariable=potentialNeighbours[i][0];
             int yVariable=potentialNeighbours[i][1];
-
             if(!wallExist(xVariable,yVariable)){//if their isn't a wall add them in real neighbours
                 for(int j=0;j<potentialNeighbours[0].length;j++){
                     realNeighbours[i][j]=potentialNeighbours[i][j];//add only valid neighbours coordinates
                 }
-
             }
         }
         return realNeighbours;
-
     }
-
     //the direction variable will depend of the SCANNER in the legendOfZoe class
     public void move(char direction) {
         int[] coordinates=getPosition();//get actual position
         int[][] allowedMouvement=checkAdjctWalls(coordinates[0],coordinates[1]);
         int[] newCoordinates =new int[2];
-
         if(direction=='w') {//move  up
             newCoordinates[0]= coordinates[0];
             newCoordinates[1]=coordinates[1]-1;
@@ -168,28 +176,8 @@ public class Entity {
                 System.out.println("Invalid move, try again in next turn!");
             }
         }
-
     }
-
-
-    //method is called if SCANNER is "x"
-    public void attack() {
-        int[][] attackerNeighbours= getAdjacentCoordinates(this.x,this.y);
-        //call loseHealth()
-        //...
-    }
-
-    public void loseHealth(Entity attacked) {
-        int force= getStrength(attacked);//attacks according to the strength zoe=1 monsters= ?
-        attacked.nbLives-=force;
-    }
-
-    public boolean isDead() {//check if dead
-        if(nbLives==0) {
-            return true;
-        }else {
-            return false;
-        }
-    }
+    
+     */
 
 }
