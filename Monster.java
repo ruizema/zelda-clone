@@ -1,62 +1,82 @@
+import java.util.Arrays;
+
 public class Monster extends Entity {
-    private int nbLives;
-    private int x;
-    private int y;
-    private boolean isDead=isDead();//the monster if dead must realeas item,change layout
-    private String itemInside;//need to create a method in entity that gets the items inside the monsters
 
-    public Monster(int nbLives, int x, int y){
-        super();
-        this.nbLives=nbLives;
-        this.x=x;
-        this.y=y;
-    }
+    private String item;
 
-    public void dead(){//once is dead =true
-        //realeases item
-        //changes layout from @ to x
+    public Monster(Level level, int nbLives, String item, int x, int y) {
+
+        this.name = "Monstre";
+        this.nbLives = (int) Math.max(0.6 * level.getLevelNumber(), 1);
+        this.x = x;
+        this.y = y;
+        this.strength = (int) Math.max(0.4 * level.getLevelNumber(), 1);
+        this.level = level;
+        this.isDead = false;
+
+        this.item = item;
 
     }
-    //public void attack(){}
 
-    //if zoe isn't in the monster's neighbours, this method is called so that it eventually tries to reach her
-    public int[] getMoveDirection(int x,int y){//x,y here is the coordinates of zoe.Do we add zoe's name in parameters?
-        int[] direction=new int[2];//[x,y] is the direction/move the monster must do.
-        int[] monsterPosition=getPosition();//method from entity
-        int xDifference=monsterPosition[0]-x;//value from monster to zoe position(on her position)
-        int yDifference=monsterPosition[1]-y;
+    // Accessor functions
 
-        if(xDifference>0){//positive x value difference,means monster needs to backup in x position
-            direction[0]=monsterPosition[0]-1;
-        }else if(xDifference<0) {//if difference is negative , monster must advance in x position
-            direction[0] = monsterPosition[0] + 1;
-        } else if (xDifference == 0) {
-            direction[0]=monsterPosition[0];//dont change it
-        }
-        if(yDifference>0){
-            direction[1]=monsterPosition[1]-1;
-        }else if(yDifference<0){
-            direction[1]=monsterPosition[1]+1;
-        }else if(yDifference==0){
-            direction[1]=monsterPosition[1];//dont change it
+    public String getItem() { return item; }
+
+    // AIs
+
+    public int[] movementAI(Boolean bonus) {
+
+        int[] movement = new int[]{0, 0};
+        Zoe zoe;
+
+        for (int i = 0; i < level.getNbObjects(); i++) {
+            if (level.getObject(i) instanceof Zoe) {
+                zoe = (Zoe) level.getObject(i);
+            }
         }
 
-        return direction;
+        int[][] adjacent = getAdjacentCoordinates();
+        int[] zoePosition = zoe.getPosition();
+        boolean zoeIsAdjacent = false;
+
+        for (int i = 0; i < adjacent.length; i++) {
+            if (Arrays.equals(adjacent[i], zoePosition)) { zoeIsAdjacent = true; }
+        }
+
+        if (zoeIsAdjacent) {
+            attack();
+        } else if (!bonus) {
+            for (int i = 0; i < 2; i++) {
+                if (zoePosition[i] < this.getPosition()[i]) {
+                    movement[i] = -1;
+                } else if (zoePosition[i] > this.getPosition()[i]) {
+                    movement[i] = 1;
+                }
+            }
+        } else {
+            // TODO : BONUS PATHFINDER AI
+            return movement;
+        }
+
+        return movement;
+
     }
 
-    public void move(){
-        int[] desiredDirection= getMoveDirection(this.x,this.y);
-        int x =desiredDirection[0];
-        int y=desiredDirection[1];
+    // Action functions
 
-        int[][] allowedMoves= checkAdjctWalls(this.x,this.y);
-
-        for(int i=0; i< allowedMoves.length;i++){
-            int xAllowed=allowedMoves[i][0];
-            int yAllowed=allowedMoves[i][1];
-            if((x==xAllowed)&&(y==yAllowed)){//it is contained
-                setPosition(x,y);
-            }//else no move allowed,monsters pass their turn.
+    public void move(int x, int y) {
+        if (canMoveBy(x, y)) {
+            this.changeX(x);
+            this.changeY(y);
         }
     }
+
+    // Passive functions
+
+    @Override
+    public void die() {
+        super.die();
+        this.item = "";
+    }
+
 }

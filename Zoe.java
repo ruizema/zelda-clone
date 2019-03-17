@@ -1,71 +1,82 @@
 public class Zoe extends Entity {
-    private boolean hasCurrentHexaforce=false;
-    private int nbLives;
-    private int y;
-    private int x;
-    private int nbHexaforces=0;//she starts with zero hxforces
-    private boolean isDead=isDead();//This method must always be checked, the second this is true , entitie dies
 
-    public Zoe(int x, int y){//constructor of zoe
-        super();
-        this.x=x;
-        this.y=y;
+    private boolean hasCurrentHexaforce;
+    private int nbHexaforces;
+
+    public Zoe(Level level, int x, int y) {
+
+        this.name = "Zoe";
+        this.nbLives = 5;
+        this.x = x;
+        this.y = y;
+        this.strength = 1;
+        this.level = level;
+        this.isDead = false;
+
+        this.hasCurrentHexaforce = false;
+        this.nbHexaforces = 0;
 
     }
 
     public int getNbHexaforce(){
         return nbHexaforces;
     }
-    //IS THIS NECESSARY?
-    public void gainLives(int nbLive) {
-        int missingHealth = 5 - this.nbLives;//whats missing to have perfect nb of lives
-        if ((nbLive == missingHealth) || (nbLive < missingHealth)) {
-            this.nbLives = nbLives;//uses all the hearths
-        } else if (nbLive > missingHealth) {
-            this.nbLives += missingHealth;//so that the lives dont pass 5
-        }
-    }
-    @Override//does it override the method ? I don't think so
-    public void move(char direction){
-        super.move(direction);//accesses the method of superclass
 
-    }
+    public boolean getHasCurrentHexaforce() { return hasCurrentHexaforce; }
 
-    //public void attack(){}//need to figure this method in entity.java
+    // Player action functions
 
-    //public String open(){}//called in usedItem? to change the layout as an open treasure or dead monster ??
-
-    public void dig(){//is called when "c" is in the scanner
-        int[][] curentNeighbours=getAdjacentCoordinates(this.x,this.y);
-        int xWall;
-        int yWall;
-        for(int i=0;i<curentNeighbours.length;i++) {//get all the neighbours coordinates
-            xWall = curentNeighbours[i][0];
-            yWall = curentNeighbours[i][1];
-
-            if (wallExist(xWall, yWall)) {//if a wall, change it to not a wall
-                setWall(this.x, this.y);//changes to false
+    public void move(int x, int y) {
+        if (canMoveBy(x, y)) {
+            if (x != 0) {
+                this.changeX(x);
+            } else {
+                this.changeY(y);
             }
         }
     }
-    public void useItem(String item){
-        switch (item) {
-            case "potionvie":
-                gainLives(5);
-                break;
-            case "coeur":
-                gainLives(1);
-                break;
-            case "hexaforce":
-                hasCurrentHexaforce=true;
-                nbHexaforces+=1;//update variable
-                break;
-            case "exit":
-                if(hasCurrentHexaforce){
-                    //call the exit method or something ?thats calls a new level
-                }
+
+    public void open() {
+
+        Treasure[] adjacentTreasures = getAdjacentTreasures();
+
+        for (int i = 0; i < adjacentTreasures.length; i++) {
+            gainItem(adjacentTreasures[i].getItem());
         }
+
     }
 
+    public void dig() {
+
+        int[][] adjacentWalls = getAdjacentWalls();
+
+        for (int i = 0; i < adjacentWalls.length; i++) {
+            level.setWall(false, adjacentWalls[i][0], adjacentWalls[i][1]);
+        }
+
+    }
+
+    // Helper functions
+
+    public Treasure[] getAdjacentTreasures() {
+
+        return (Treasure[]) getAdjacentObjects()[1].toArray(new Treasure[0]);
+
+    }
+
+    public void gainItem(String item) {
+        switch (item) {
+            case "coeur":
+                changeNbLives(1);
+                break;
+            case "potion de vie":
+                changeNbLives(5 - this.getNbLives());
+                break;
+            case "hexaforce":
+                nbHexaforces++;
+                hasCurrentHexaforce = true;
+                break;
+        }
+    }
 
 }

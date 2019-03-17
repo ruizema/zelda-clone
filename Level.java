@@ -3,6 +3,7 @@ public class Level {
     private int levelNumber;
     private boolean[][] walls;
     private Object[] objects;
+    private Exit exit;
 
     public Level(int levelNumber) {
 
@@ -31,15 +32,16 @@ public class Level {
                     objects[i] = new Treasure(item, x, y);
                     break;
                 case "monstre":
-                    objects[i] = new Monster((int) Math.max(0.6 * levelNumber, 1), x, y);
+                    objects[i] = new Monster(this, (int) Math.max(0.6 * levelNumber, 1), item, x, y);
                     break;
                 case "sortie":
                     objects[i] = new Exit(x, y);
+                    this.exit = (Exit) objects[i];
                     break;
                 case "zoe":
-                    objects[i] = new Zoe(x, y);
+                    objects[i] = new Zoe(this, x, y);
                     if (levelNumber == 1) {
-                        Zoe.setNbLives(5);
+                        Zoe.changeNbLives(5);
                     }
                     break;
             }
@@ -64,6 +66,10 @@ public class Level {
     public Object getObject(int idx) {
         return objects[idx];
     }
+
+    public int[] getExitPosition() { return exit.getPosition(); }
+
+    public boolean checkExit(Zoe zoe) { return exit.canAccessExit(zoe); }
 
     // Used for iterating through the map & the array of objects
 
