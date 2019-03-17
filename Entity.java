@@ -22,13 +22,16 @@ public abstract class Entity {
             }
         }
     }
+
     public Object[] getEntities(){
         findEntity();
         return this.object;//the object table is now updated with entities
     }
+
     public Entity getEntity(int idx){
         return (Entity) object[idx];//casting it as an entity
     }
+
     private boolean[][] walls=new boolean[Level.getMapWidth()][Level.getMapHeight()];//x,y
     private void findWalls(){
         for(int i=0;i<Level.getMapHeight();i++){
@@ -44,19 +47,21 @@ public abstract class Entity {
     public boolean wallExist(int x, int y ){
         getWallTable();
         return this.walls[x][y];
+
     }
     public void setWall( int x, int y) {
         if (wallExist(x, y)) {
             walls[y][x] = false;
         }
     }
+
      */
 
     // Accessor functions
 
-    public int getNbLives() {
-        return nbLives;
-    }
+    public int getNbLives() { return nbLives; }
+
+    public void setNbLives(int nbLives) { this.nbLives = nbLives; }
 
     public int[] getPosition() { return new int[]{x, y}; }
 
@@ -112,12 +117,6 @@ public abstract class Entity {
         int[][] adjacentCoordinates = getAdjacentCoordinates();
         ArrayList<Entity> adjacentEntities = new ArrayList<>();
 
-        for (int i = 0; i < adjacentCoordinates.length; i++) {
-            for (int j = 0; j < level.getNbObjects(); j++) {
-                if
-            }
-        }
-
         for (int i = 0; i < level.getNbObjects(); i++) {
             Object object = level.getObject(i);
             if (object instanceof Entity) {
@@ -137,22 +136,28 @@ public abstract class Entity {
     public int[][] checkAdjctWalls(int x,int y){
         int[][] potentialNeighbours = getAdjacentCoordinates(x,y);
         int[][] realNeighbours= new int[9][2];
+
         for(int i=0;i<potentialNeighbours.length;i++){
             int xVariable=potentialNeighbours[i][0];
             int yVariable=potentialNeighbours[i][1];
+
             if(!wallExist(xVariable,yVariable)){//if their isn't a wall add them in real neighbours
                 for(int j=0;j<potentialNeighbours[0].length;j++){
                     realNeighbours[i][j]=potentialNeighbours[i][j];//add only valid neighbours coordinates
                 }
+
             }
         }
         return realNeighbours;
+
     }
+
     //the direction variable will depend of the SCANNER in the legendOfZoe class
     public void move(char direction) {
         int[] coordinates=getPosition();//get actual position
         int[][] allowedMouvement=checkAdjctWalls(coordinates[0],coordinates[1]);
         int[] newCoordinates =new int[2];
+
         if(direction=='w') {//move  up
             newCoordinates[0]= coordinates[0];
             newCoordinates[1]=coordinates[1]-1;
@@ -176,6 +181,7 @@ public abstract class Entity {
                 System.out.println("Invalid move, try again in next turn!");
             }
         }
+
     }
     
      */

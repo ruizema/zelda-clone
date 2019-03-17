@@ -28,7 +28,7 @@ public class Level {
             int y = Integer.parseInt(object[2 + temp]);
             switch (objectType) {
                 case "tresor":
-                    objects[i] = new Treasure(item);
+                    objects[i] = new Treasure(item, x, y);
                     break;
                 case "monstre":
                     objects[i] = new Monster((int) Math.max(0.6 * levelNumber, 1), x, y);
@@ -47,17 +47,11 @@ public class Level {
 
     }
 
-    // Getters & setters
+    // Accessor functions
 
-    public int getLevelNumber() {
-        return levelNumber;
-    }
+    public int getLevelNumber() { return levelNumber; }
 
-    public void setLevelNumber(int levelNumber) {
-        this.levelNumber = levelNumber;
-    }
-
-    // Accessing specific objects & walls
+    public void setLevelNumber(int levelNumber) { this.levelNumber = levelNumber; }
 
     public boolean getWall(int x, int y) {
         return walls[y][x];
@@ -72,9 +66,8 @@ public class Level {
     }
 
     // Used for iterating through the map & the array of objects
-    public int getNbObjects() {
-        return objects.length;
-    }
+
+    public int getNbObjects() { return objects.length; }
 
     public int getMapHeight() {
         return walls.length;
