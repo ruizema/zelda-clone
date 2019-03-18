@@ -1,9 +1,21 @@
 import java.util.Arrays;
 
+/**
+ * The Monster class
+ */
 public class Monster extends Entity {
 
     private String item;
 
+    /**
+     * Constructor for the Monsters in the game. This allows to have independant information for each monsters
+     * in the game for each level.
+     * @param level Keeps track of which level this monster belongs to
+     * @param nbLives of the monster in the level
+     * @param item contained in the monster once it dies
+     * @param x coordinates of the monster in the map
+     * @param y
+     */
     public Monster(Level level, int nbLives, String item, int x, int y) {
 
         this.name = "Monstre";
@@ -13,21 +25,28 @@ public class Monster extends Entity {
         this.strength = (int) Math.max(0.4 * level.getLevelNumber(), 1);
         this.level = level;
         this.isDead = false;
-
         this.item = item;
 
     }
 
-    // Accessor functions
+    /**
+     * Getter for the item contained in the monster but will only be released when it has been defeated by Zoe.
+     * @return the item's name
+     */
 
     public String getItem() { return item; }
 
-    // AIs
+    /**
+     * This method is the "artificial intelligence " of the monster, meaning it controls their actions when it's
+     * their turn to play.It is not the player controlling their movements.
+     * @param bonus
+     * @return
+     */
 
-    public int[] movementAI(Boolean bonus) {
+    public void movementAI(Boolean bonus) {
 
         int[] movement = new int[]{0, 0};
-        Zoe zoe;
+        Zoe zoe = level.getZoe();
 
         for (int i = 0; i < level.getNbObjects(); i++) {
             if (level.getObject(i) instanceof Zoe) {
@@ -55,14 +74,19 @@ public class Monster extends Entity {
             }
         } else {
             // TODO : BONUS PATHFINDER AI
-            return movement;
+            System.out.println("TBD");
         }
 
-        return movement;
+        move(movement[0], movement[1]);
 
     }
 
-    // Action functions
+    /**
+     * The method move is used to verify if the monster can make a move to the desired position, meaning if their's
+     * a wall on thst position his position will not change.
+     * @param x coordinates of the desired cell in the monsters neighbours.
+     * @param y
+     */
 
     public void move(int x, int y) {
         if (canMoveBy(x, y)) {
@@ -71,12 +95,25 @@ public class Monster extends Entity {
         }
     }
 
-    // Passive functions
+    /**
+     *Once the monster has been defeated by Zoe and has released his item , the monster must die .
+     */
 
     @Override
     public void die() {
         super.die();
-        this.item = "";
+    }
+    /**
+     * Overrides the toString method to allow the display of the monster on the map when it is alive and dead
+     * @return a string representing the monster's status
+     */
+    @Override
+    public String toString() {
+        if (isDead) {
+            return "x";
+        } else {
+            return "@";
+        }
     }
 
 }
